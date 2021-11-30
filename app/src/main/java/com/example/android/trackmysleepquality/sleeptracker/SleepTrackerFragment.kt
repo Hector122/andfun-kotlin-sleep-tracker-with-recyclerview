@@ -43,12 +43,14 @@ class SleepTrackerFragment : Fragment() {
      *
      * This function uses DataBindingUtil to inflate R.layout.fragment_sleep_quality.
      */
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater,
+                              container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentSleepTrackerBinding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_sleep_tracker, container, false)
+            inflater, R.layout.fragment_sleep_tracker, container, false
+        )
         
         val application = requireNotNull(this.activity).application
         
@@ -56,9 +58,9 @@ class SleepTrackerFragment : Fragment() {
         
         val viewModelFactory = SleepTrackerViewModelFactory(dataSource, application)
         
-        val sleepTrackerViewModel =
-            ViewModelProvider(
-                this, viewModelFactory).get(SleepTrackerViewModel::class.java)
+        val sleepTrackerViewModel = ViewModelProvider(
+            this, viewModelFactory
+        ).get(SleepTrackerViewModel::class.java)
         
         binding.sleepTrackerViewModel = sleepTrackerViewModel
         
@@ -90,25 +92,37 @@ class SleepTrackerFragment : Fragment() {
                 // followed by back.
                 // Also: https://stackoverflow.com/questions/28929637/difference-and-uses-of-oncreate-oncreateview-and-onactivitycreated-in-fra
                 this.findNavController().navigate(
-                    SleepTrackerFragmentDirections
-                        .actionSleepTrackerFragmentToSleepQualityFragment(night.nightId))
+                    SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(
+                        night.nightId
+                    )
+                )
                 // Reset state to make sure we only navigate once, even if the device
                 // has a configuration change.
                 sleepTrackerViewModel.doneNavigating()
             }
         })
         
-        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner, Observer { night ->
-            night?.let {
-                
-                this.findNavController().navigate(
-                    SleepTrackerFragmentDirections
-                        .actionSleepTrackerFragmentToSleepDetailFragment(night))
-                sleepTrackerViewModel.onSleepDataQualityNavigated()
-            }
-        })
+        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner,
+            Observer { night ->
+                night?.let {
+                    
+                    this.findNavController().navigate(
+                        SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepDetailFragment(
+                            night
+                        )
+                    )
+                    sleepTrackerViewModel.onSleepDataQualityNavigated()
+                }
+            })
         
         val manager = GridLayoutManager(activity, 3)
+        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) = when (position) {
+                0 -> 3
+                else -> 1
+            }
+        }
+        
         binding.sleepList.layoutManager = manager
         
         val adapter = SleepNightAdapter(SleepNightAdapter.SleepNightListener { nightId ->
@@ -119,7 +133,7 @@ class SleepTrackerFragment : Fragment() {
         
         sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it)
+                adapter.addHeaderAndSummitList(it)
             }
         })
         
