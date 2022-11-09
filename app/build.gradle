@@ -42,7 +42,14 @@ android {
     buildFeatures {
         dataBinding true
     }
-
+    //add this for error No static method metafactory
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
