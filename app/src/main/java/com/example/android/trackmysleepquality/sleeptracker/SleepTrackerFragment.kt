@@ -68,7 +68,9 @@ class SleepTrackerFragment : Fragment() {
 
         sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.data = it
+                // not need with DiffUtil class
+                // adapter.data = it
+                adapter.submitList(it)
             }
         })
 
