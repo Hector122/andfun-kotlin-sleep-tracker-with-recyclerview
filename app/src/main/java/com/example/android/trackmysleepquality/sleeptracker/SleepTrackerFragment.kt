@@ -69,23 +69,6 @@ class SleepTrackerFragment : Fragment() {
         binding.sleepTrackerViewModel = sleepTrackerViewModel
         binding.lifecycleOwner = this
 
-        val manager = GridLayoutManager(activity, 3)
-        binding.sleepList.layoutManager = manager
-
-        val adapter = SleepNightAdapter(SleepNightAdapter.SleepNightListener {
-            nightId -> Toast.makeText(context, nightId.toString(), Toast.LENGTH_SHORT).show()
-        })
-        binding.sleepList.adapter = adapter
-
-        sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                // not need with DiffUtil class
-                // adapter.data = it
-                adapter.submitList(it)
-            }
-        })
-
-
         // Add an Observer on the state variable for showing a Snackbar message
         // when the CLEAR button is pressed.
         sleepTrackerViewModel.showSnackBarEvent.observe(viewLifecycleOwner, Observer {
@@ -118,6 +101,40 @@ class SleepTrackerFragment : Fragment() {
                 // Reset state to make sure we only navigate once, even if the device
                 // has a configuration change.
                 sleepTrackerViewModel.doneNavigating()
+            }
+        })
+
+        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner, Observer {night ->
+            night?.let {
+                this.findNavController().navigate(SleepTrackerFragmentDirections
+                    .actionSleepTrackerFragmentToSleepDetailFragment(night))
+
+                sleepTrackerViewModel.onSleepDataQualityNavigated()
+            }
+        })
+
+//        sleepTrackerViewModel.navigateToSleepDataQuality.observe(viewLifecycleOwner, Observer { night ->
+//                night.let {
+//                    this.findNavController().navigate(SleepTrackerFragmentDirections
+//                        .actionSleepTrackerFragmentToSleepDetailFragment(it))
+//
+//                    sleepTrackerViewModel.onSleepDataQualityNavigated()
+//                }
+//            })
+
+        val manager = GridLayoutManager(activity, 3)
+        binding.sleepList.layoutManager = manager
+
+        val adapter = SleepNightAdapter(SleepNightAdapter.SleepNightListener { nightId ->
+            sleepTrackerViewModel.onSleepNightClicked(nightId)
+        })
+        binding.sleepList.adapter = adapter
+
+        sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                // not need with DiffUtil class
+                // adapter.data = it
+                adapter.submitList(it)
             }
         })
 
