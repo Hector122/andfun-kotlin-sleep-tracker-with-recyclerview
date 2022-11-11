@@ -123,6 +123,14 @@ class SleepTrackerFragment : Fragment() {
 //            })
 
         val manager = GridLayoutManager(activity, 3)
+        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup(){
+            override fun getSpanSize(position: Int): Int {
+                return when(position){
+                    0 -> 3
+                    else -> 1
+                }
+            }
+        }
         binding.sleepList.layoutManager = manager
 
         val adapter = SleepNightAdapter(SleepNightAdapter.SleepNightListener { nightId ->
@@ -134,7 +142,7 @@ class SleepTrackerFragment : Fragment() {
             it?.let {
                 // not need with DiffUtil class
                 // adapter.data = it
-                adapter.submitList(it)
+                adapter.addHeaderAndSummitList(it)
             }
         })
 
